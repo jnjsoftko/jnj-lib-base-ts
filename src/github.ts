@@ -5,7 +5,8 @@ import { loadJson } from "./builtin.js";
 import dotenv from "dotenv";
 dotenv.config(); // 실행 경로에 있는 `.env`
 
-const settingsPath = process.env.ENV_SETTINGS_PATH;
+const settingsPath =
+  process.env.ENV_SETTINGS_PATH ?? "C:/JnJ-soft/Developments/_Settings";
 
 // * find github token
 const findGithubAccount = (userName: string) => {
