@@ -330,6 +330,82 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
   }
 };
 
+// & Dict, Dicts
+/**
+ * Get Upsert Dicts
+ *
+ * @param olds - 원본 dicts
+ * @param news - 출력 dicts
+ * @param keys - (동일여부) 비교 대상 keys
+ *
+ * @example
+ *
+ * const olds = [{a: 1, b: 2, c: 3}, {a: 4, b: 5, c: 6}, {a: 4, b: 6, c: 9}]
+ * const news = [{a: 1, b: 2, d: 3}, {a: 4, b: 6, d: 8}, {a: 4, b: 8, d: 10}]
+ * const keys = ['a', 'b']
+ * let upserts = getUpsertDicts(olds, news, keys)
+ *
+ * => upserts
+ * upserts.adds = [{a: 4, b: 8, d: 10}]  // dicts exist in news, but not exist in olds for keys['a', 'b']. {a: 4, b: 8} is
+ * upserts.dels = [{a: 4, b: 5, c: 6}]  // dicts not exist in news, but not exist in olds for keys['a', 'b']. {a: 4, b: 5} is in `news`, but is not in `olds`
+ * upserts.upds = [{a: 1, b: 2, d: 3}, {a: 4, b: 6, d: 8}]  // dicts exist in news, and exist in olds for keys['a', 'b']. {a: 1, b: 2}, {a: 4, b: 6} are in `news`, `olds`.
+ */
+function getUpsertDicts(olds: any[], news: any[], keys: any[]) {
+  const upserts = {
+    adds: [],
+    dels: [],
+    upds: [],
+  };
+
+  // Check for adds and upds dicts
+  news.forEach((newDict: any) => {
+    const matchingOldDict = olds.find((oldDict) =>
+      keys.every((key) => newDict[key] === oldDict[key])
+    );
+
+    if (!matchingOldDict) {
+      upserts.adds.push(newDict);
+    } else if (
+      !Object.entries(newDict).every(
+        ([key, value]) => matchingOldDict[key] === value
+      )
+    ) {
+      upserts.upds.push(newDict);
+    }
+  });
+
+  // Check for dels dicts
+  olds.forEach((oldDict: any) => {
+    const matchingNewDict = news.find((newDict) =>
+      keys.every((key) => oldDict[key] === newDict[key])
+    );
+
+    if (!matchingNewDict) {
+      upserts.dels.push(oldDict);
+    }
+  });
+
+  return upserts;
+}
+
+/**
+ * Remove Keys From Dict
+ *
+ * @param dict - 원본 dict
+ * @param keys - 제거할 keys
+ *
+ * @example
+ * let upserts = getUpsertDicts({a: 1, b: 2, c: 3}, ['a', 'c'])
+ *
+ * => {b: 2}
+ */
+function removeDictKeys(dict: any, keys: any[]) {
+  for (let key of keys) {
+    delete dict[key];
+  }
+  return dict;
+}
+
 // & Data / Time
 /**
  * Convert date string to ko-KR(yyyy년 M월 d일 (요일))
@@ -446,6 +522,8 @@ export {
   arrsFromDicts, // Arrs From Dicts
   arrsAddedDefaults, // Arrs Added Default Values
   convertStr, // convert string format
+  getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
+  removeDictKeys, // Remove Keys From Dict
   now,
   delay,
   sleep,
