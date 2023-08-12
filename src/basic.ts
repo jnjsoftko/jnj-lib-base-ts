@@ -1,7 +1,6 @@
 /**
  * A library for Basic(Package Without Importing) Utility Functions
  *
- * @packageDocumentation
  *
  * FileTypes(Extensions)
  *   - srt:  SubRipText  동영상 자막용 데이터
@@ -86,9 +85,7 @@ const evalStr = (str: string, values: any) => {
   const regex = /\${(.*?)}/g;
   return str.replace(regex, (match, expression) => {
     const code = `return ${expression}`;
-    const value = new Function(...Object.keys(values), code)(
-      ...Object.values(values)
-    );
+    const value = new Function(...Object.keys(values), code)(...Object.values(values));
     return value;
   });
 };
@@ -126,12 +123,7 @@ const srtFromTsv = (str: string) => {
  * "4","5","6"`
  * result: [["a", "b", "c"], ["1","2","3"], ["4","5","6"]]
  */
-const arrsFromCsv = (
-  csv: string,
-  sep = ",",
-  hasQuote = true,
-  newline = "\n"
-) => {
+const arrsFromCsv = (csv: string, sep = ",", hasQuote = true, newline = "\n") => {
   const arrs = [];
   for (const line of csv.split(newline)) {
     if (hasQuote) {
@@ -306,13 +298,9 @@ const arrsAddedDefaults = (arrs: any[], defaults = {}, isPush = false) => {
   const addKeys = Object.keys(defaults);
   const addVals = Object.values(defaults);
   if (isPush) {
-    return arrs.map((arr, i) =>
-      i === 0 ? [...arr, ...addKeys] : [...arr, ...addVals]
-    );
+    return arrs.map((arr, i) => (i === 0 ? [...arr, ...addKeys] : [...arr, ...addVals]));
   } else {
-    return arrs.map((arr, i) =>
-      i === 0 ? [...addKeys, ...arr] : [...addVals, ...arr]
-    );
+    return arrs.map((arr, i) => (i === 0 ? [...addKeys, ...arr] : [...addVals, ...arr]));
   }
 };
 
@@ -331,6 +319,21 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
 };
 
 // & Dict, Dicts
+/**
+ * Swap Dict Key-Value
+ *
+ * @example
+ * swapDict({a: 1, b: 2})
+ * =>{'1': 'a', '2': 'b'}
+ */
+function swapDict(dict: any) {
+  var ret = {};
+  for (var key in dict) {
+    ret[dict[key]] = key;
+  }
+  return ret;
+}
+
 /**
  * Get Upsert Dicts
  *
@@ -359,26 +362,18 @@ function getUpsertDicts(olds: any[], news: any[], keys: any[]) {
 
   // Check for adds and upds dicts
   news.forEach((newDict: any) => {
-    const matchingOldDict = olds.find((oldDict) =>
-      keys.every((key) => newDict[key] === oldDict[key])
-    );
+    const matchingOldDict = olds.find((oldDict) => keys.every((key) => newDict[key] === oldDict[key]));
 
     if (!matchingOldDict) {
       upserts.adds.push(newDict);
-    } else if (
-      !Object.entries(newDict).every(
-        ([key, value]) => matchingOldDict[key] === value
-      )
-    ) {
+    } else if (!Object.entries(newDict).every(([key, value]) => matchingOldDict[key] === value)) {
       upserts.upds.push(newDict);
     }
   });
 
   // Check for dels dicts
   olds.forEach((oldDict: any) => {
-    const matchingNewDict = news.find((newDict) =>
-      keys.every((key) => oldDict[key] === newDict[key])
-    );
+    const matchingNewDict = news.find((newDict) => keys.every((key) => oldDict[key] === newDict[key]));
 
     if (!matchingNewDict) {
       upserts.dels.push(oldDict);
@@ -522,6 +517,7 @@ export {
   arrsFromDicts, // Arrs From Dicts
   arrsAddedDefaults, // Arrs Added Default Values
   convertStr, // convert string format
+  swapDict, // Swap Dict Key-Value
   getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict
   now,

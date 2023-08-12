@@ -15,6 +15,7 @@ export {
   arrsFromDicts, // Arrs From Dicts
   arrsAddedDefaults, // Arrs Added Default Values
   convertStr, // convert string format
+  swapDict, // Swap Dict Key-Value
   getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict
   now,
@@ -32,8 +33,9 @@ export {
   saveJson, //
   mkdir, //
   cpdir, // 폴더 복사(recursive)
+  filesInFolder, // 파일 목록
   findAllFiles, // 파일 목록(recursive)
-  findFileList, // convert string format
+  findFileList, // 파일 목록(filter, map)
   // renameFilesInFolder
 } from "./builtin.js";
 
