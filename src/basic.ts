@@ -319,20 +319,20 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
 };
 
 // & Dict, Dicts
-/**
- * Swap Dict Key-Value
- *
- * @example
- * swapDict({a: 1, b: 2})
- * =>{'1': 'a', '2': 'b'}
- */
-function swapDict(dict: any) {
-  var ret = {};
-  for (var key in dict) {
-    ret[dict[key]] = key;
-  }
-  return ret;
-}
+// /**
+//  * Swap Dict Key-Value
+//  *
+//  * @example
+//  * swapDict({a: 1, b: 2})
+//  * =>{'1': 'a', '2': 'b'}
+//  */
+// function swapDict(dict: any) {
+//   var ret = {};
+//   for (var key in dict) {
+//     ret[dict[key]] = key;
+//   }
+//   return ret;
+// }
 
 /**
  * Get Upsert Dicts
@@ -517,7 +517,7 @@ export {
   arrsFromDicts, // Arrs From Dicts
   arrsAddedDefaults, // Arrs Added Default Values
   convertStr, // convert string format
-  swapDict, // Swap Dict Key-Value
+  // swapDict, // Swap Dict Key-Value
   getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict
   now,
