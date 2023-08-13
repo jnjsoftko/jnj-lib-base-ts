@@ -33,9 +33,9 @@ export {
   saveJson, //
   mkdir, //
   cpdir, // 폴더 복사(recursive)
-  filesInFolder, // 파일 목록
-  findAllFiles, // 파일 목록(recursive)
-  findFileList, // 파일 목록(filter, map)
+  findFiles, // 파일 목록
+  findFilesRecusive, // 파일 목록(recursive)
+  // findFileList, // 파일 목록(filter, map)
   // renameFilesInFolder
 } from "./builtin.js";
 

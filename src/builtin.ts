@@ -37,14 +37,22 @@ const setPath = (path: string) => {
  * Load data(string) from file with charset(encoding)
  */
 const loadFile = (path: string, encoding: BufferEncoding = "utf8") => {
-  return removeBOM(fs.readFileSync(setPath(path), { encoding }));
+  try {
+    return removeBOM(fs.readFileSync(setPath(path), { encoding }));
+  } catch {
+    return null;
+  }
 };
 
 /**
  * Load data(json) from file with charset(encoding)
  */
 const loadJson = (path: string, encoding: BufferEncoding = "utf8") => {
-  return JSON.parse(removeBOM(fs.readFileSync(setPath(path), { encoding })));
+  try {
+    return JSON.parse(removeBOM(fs.readFileSync(setPath(path), { encoding })));
+  } catch {
+    return null;
+  }
 };
 
 /**
@@ -85,7 +93,7 @@ const cpdir = (srcDir: string, dstDir: string, recursive = true) => {
  * find All Files In Folder
  * @param folder
  */
-const filesInFolder = (folder: string) => {
+const findFiles = (folder: string) => {
   return fs
     .readdirSync(folder, { withFileTypes: true })
     .filter((item) => !item.isDirectory())
@@ -97,13 +105,13 @@ const filesInFolder = (folder: string) => {
  * @param folder
  * @param  arrayOfFiles
  */
-const findAllFiles = (folder: string, arrayOfFiles: string[] = []) => {
+const findFilesRecusive = (folder: string, arrayOfFiles: string[] = []) => {
   const files = fs.readdirSync(folder);
   arrayOfFiles = arrayOfFiles || [];
 
   files.forEach(function (file) {
     if (fs.statSync(folder + "/" + file).isDirectory()) {
-      arrayOfFiles = findAllFiles(folder + "/" + file, arrayOfFiles);
+      arrayOfFiles = findFilesRecusive(folder + "/" + file, arrayOfFiles);
     } else {
       arrayOfFiles.push(Path.join(folder, "/", file));
     }
@@ -112,19 +120,19 @@ const findAllFiles = (folder: string, arrayOfFiles: string[] = []) => {
   return arrayOfFiles;
 };
 
-/**
- * find FileList In Folder
- * @param folder
- * @param  filterCb
- * @param  mapCb
- */
-const findFileList = (folder: string, filterCb: Function, mapCb: Function) => {
-  return fs
-    .readdirSync(folder)
-    .filter((name) => filterCb(name))
-    .map((name) => mapCb(name));
-  // return fs.readdirSync(`${process.env.ROOT_DIR}/${folder}`).filter((name)=> name.endsWith('.ts')).map((name) => `${folder}/${name}`);
-};
+// /**
+//  * find Files In Folder
+//  * @param folder
+//  * @param  filterCb
+//  * @param  mapCb
+//  */
+// const findFileList = (folder: string, filterCb: Function, mapCb: Function) => {
+//   return fs
+//     .readdirSync(folder)
+//     .filter((name) => filterCb(name))
+//     .map((name) => mapCb(name));
+//   // return fs.readdirSync(`${process.env.ROOT_DIR}/${folder}`).filter((name)=> name.endsWith('.ts')).map((name) => `${folder}/${name}`);
+// };
 
 /**
  * rename Files In Folder
@@ -167,8 +175,8 @@ export {
   saveJson, //
   mkdir, //
   cpdir, // 폴더 복사(recursive)
-  filesInFolder, // 파일 목록
-  findAllFiles, // 파일 목록(recursive)
-  findFileList, // 파일 목록(filter, map)
+  findFiles, // 파일 목록
+  findFilesRecusive, // 파일 목록(recursive)
+  // findFileList, // 파일 목록(filter, map)
   // renameFilesInFolder
 };
