@@ -1,19 +1,48 @@
-// * [create repository](https://octokit.github.io/rest.js/v19#repos-create-for-authenticated-user)
+/** Github
+ *
+ * Description
+ *   - A Class for Using Github
+ *
+ * Functions
+ *   [X]
+ *
+ * Usages
+ *   -
+ *
+ * Requirements
+ *   -
+ *
+ * References
+ *   - [create repository](https://octokit.github.io/rest.js/v19#repos-create-for-authenticated-user)
+ *
+ * Authors
+ *   - Moon In Learn <mooninlearn@gmail.com>
+ *   - JnJsoft Ko <jnjsoft.ko@gmail.com>
+ */
+// & Import AREA
+// &---------------------------------------------------------------------------
+// ? External Modules
 import { execSync } from "child_process";
 import { Octokit } from "@octokit/rest";
-import { loadJson } from "./builtin.js";
 import dotenv from "dotenv";
+
+// ? UserMade Modules
+import { loadJson } from "./builtin.js";
+
+// & Variable AREA
+// &---------------------------------------------------------------------------
 dotenv.config(); // 실행 경로에 있는 `.env`
+const settingsPath = process.env.ENV_SETTINGS_PATH ?? "C:/JnJ-soft/Developments/_Settings";
 
-const settingsPath =
-  process.env.ENV_SETTINGS_PATH ?? "C:/JnJ-soft/Developments/_Settings";
-
+// & Function AREA
+// &---------------------------------------------------------------------------
 // * find github token
 const findGithubAccount = (userName: string) => {
   return loadJson(`${settingsPath}/Apis/github.json`)[userName];
 };
 
-// * class
+// & Class AREA
+// &---------------------------------------------------------------------------
 class Github {
   userName: string;
   account: any;
@@ -101,12 +130,15 @@ class Github {
   };
 }
 
-// & EXPORT
+// & Export AREA
+// &---------------------------------------------------------------------------
 export {
   findGithubAccount, // func
   Github, // class
 };
 
+// & Test AREA
+// &---------------------------------------------------------------------------
 // const github = new Github('mooninlearn');
 
 // github.findAllRepos();

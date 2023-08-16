@@ -18,32 +18,18 @@
  *   - pairs: [keys, valss], valss: array of vals
  */
 
-// & test
+// & Functions AREA
+// &---------------------------------------------------------------------------
+// * test
 /**
  * Ping(Test)
  */
 const ping = () => "pong";
 
-// & types
+// * types
 // type Str = string | undefined | null;
 
-// & Deal with DataType
-/**
- * Pop Dict By Key
- *
- * @param obj - dict
- * @param key - string
- *
- * @example
- * pop({'a': 1, 'b': 2}, 'a') => {'b': 2}
- */
-const popDict = (obj: any, key: string) => {
-  let val = obj[key];
-  delete obj[key];
-  return val;
-};
-
-// & isTruthy / isFalsy / isValidStr / isEmpty
+// * isTruthy, isFalsy, isValidStr, isEmpty
 // const isFalsy = (v: any) => {
 //   return (v === false || v === undefined || v === null || Number.isNaN(v) || v === 0 || v.length === 0 || Object.keys(v).length === 0)
 // }
@@ -68,16 +54,20 @@ const popDict = (obj: any, key: string) => {
 //   }
 // };
 
-// & Convert Object
+// * Convert Object
+/**
+ * Serialize NonPOJOs
+ * @remarks
+ */
 const serializeNonPOJOs = (obj: any) => {
   return structuredClone(obj);
 };
 
-// & String
+// * String
 /**
  * Evaluate String including `${expression}`
  *
- * @expression
+ * @example
  * evalStr('https://www.a.com/pgno=${i}&test=${j+1}&test2=${k+3}&test3=${i+5}', { i: 5, j: 6, k:7 });
  * => 'https://www.a.com/pgno5&test=7&test2=10&test3=10'
  */
@@ -90,7 +80,6 @@ const evalStr = (str: string, values: any) => {
   });
 };
 
-// & Convert Format of String
 /**
  * Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
  */
@@ -115,13 +104,12 @@ const srtFromTsv = (str: string) => {
  * @param hasQuote
  * @param newline
  *
- * @returns arrs
- *
  * @example
- * csv : `"a "," b","c"
+ * csv = `"a "," b","c"
  * "1","2","3"
  * "4","5","6"`
- * result: [["a", "b", "c"], ["1","2","3"], ["4","5","6"]]
+ * arrsFromCsv(csv)
+ *  => [["a", "b", "c"], ["1","2","3"], ["4","5","6"]]
  */
 const arrsFromCsv = (csv: string, sep = ",", hasQuote = true, newline = "\n") => {
   const arrs = [];
@@ -147,11 +135,9 @@ const arrsFromCsv = (csv: string, sep = ",", hasQuote = true, newline = "\n") =>
  * @param hasQuote
  * @param newline
  *
- * @returns csv - csv string
- *
  * @example
- * arrs : [["a", "b", "c"], ["1","2","3"], ["4","5","6"]]
- * result : `"a "," b","c"
+ * csvFromArrs([["a", "b", "c"], ["1","2","3"], ["4","5","6"]])
+ *  => `"a "," b","c"
  * "1","2","3"
  * "4","5","6"`
  */
@@ -168,20 +154,30 @@ const csvFromArrs = (arrs: any, sep = ",", hasQuote = true, newline = "\n") => {
 };
 
 /**
+ * Main Converter
+ * @remarks
+ * format coverter(string, arrays, dicts)
+ */
+const convertStr = (data: string, srcType: string, dstType: string) => {
+  // return tsvFromSrt(data);
+  if (srcType == "srt" && dstType == "tsv") {
+    return tsvFromSrt(data);
+  } else if (srcType == "tsv" && dstType == "srt") {
+    return srtFromTsv(data);
+  }
+};
+
+// * Arr, Arrs, Dict, Dicts
+/**
  * Returns arr From arrs(array of array).
  *
- *
  * @param arrs - source arrays
- * @param index - extracted target index
+ * @param index - extracted target index(추출하고자 하는 배열의 index값)
  * @hasHeader - has header (bool)
  *
  * @example
- * ```
- * console.log(arrFromArrs([[1,2,3], [4,5,6]], 1))
- *
- * # result
- * [2, 5]
- * ```
+ * arrFromArrs([[1, 2, 3], [4, 5, 6]], 1)
+ *  => [2, 5]
  */
 const arrFromArrs = (arrs: any[], index = 0, hasHeader = false) => {
   const arr = arrs.map((c) => c[index]);
@@ -190,29 +186,39 @@ const arrFromArrs = (arrs: any[], index = 0, hasHeader = false) => {
 
 /**
  * Arr From Dicts(Extract array By Key)
- *
  * @param dicts - source dicts
  *
  * @example
- *
+ *  arrFromDicts([{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}], 'h1')
+ *   => ['v11', 'v21']
  */
 const arrFromDicts = (dicts: any[], key: string) => {
   return dicts.map((dict) => dict[key]);
 };
 
 /**
+ * Pop Dict By Key
+ * @param obj - dict
+ * @param key - string
+ *
+ * @example
+ * pop({'a': 1, 'b': 2}, 'a')
+ *  => {'b': 2}
+ */
+const popDict = (obj: any, key: string) => {
+  let val = obj[key];
+  delete obj[key];
+  return val;
+};
+
+/**
  * Returns Dict(object) From Pair(Keys, Vals)
- *
- *
  * @param keys - dict keys
  * @param vals - dict values
  *
  * @example
- * ```
- * console.log(dictFromPair(['a', 'b'], [1, 2]))
- *
- * # result
- * {'a': 1, 'b': 2}
+ * dictFromPair(['a', 'b'], [1, 2]))
+ *  => {'a': 1, 'b': 2}
  * ```
  */
 const dictFromPair = (keys: any[], vals: any[]) => {
@@ -224,17 +230,12 @@ const dictFromPair = (keys: any[], vals: any[]) => {
 
 /**
  * Returns Dicts(objects) From Pairs(Keys, Valss)
- *
  * @param keys - dict keys
  * @param vals - array of values
  *
  * @example
- * ```
- * console.log(dictFromPair(['a', 'b'], [[1, 2], [3,4]]))
- *
- * # result
- * [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
- * ```
+ * dictFromPair(['a', 'b'], [[1, 2], [3,4]])
+ *  => [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
  */
 const dictsFromPairs = (keys: any[], valss: any[][]) => {
   return valss.map((vals) =>
@@ -247,11 +248,10 @@ const dictsFromPairs = (keys: any[], valss: any[][]) => {
 
 /**
  * Arrs From Dict
- *
  * @param dict - source dict
- *
  * @example
- *
+ * arrsFromDict({'h1': 'v11', 'h1': 'v12'})
+ *  => [['h1', 'h2'], ['v11', 'v12']]
  */
 const arrsFromDict = (dct: any) => {
   if (dct === null || typeof dct !== "object") {
@@ -264,11 +264,11 @@ const arrsFromDict = (dct: any) => {
 
 /**
  * Arrs From Dicts
- *
  * @param dicts - source dicts
  *
  * @example
- *
+ * arrsFromDicts([{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}])
+ *  => [['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']]
  */
 const arrsFromDicts = (dicts: any[]) => {
   const arrs = [];
@@ -286,13 +286,13 @@ const arrsFromDicts = (dicts: any[]) => {
 
 /**
  * Arrs Added Default Values
- *
  * @param arrs - given arrs
  * @param defaults - added default values
  * @param isPush -
  *
  * @example
- *
+ *  arrsAddedDefaults([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']], {'h3': ''}, false)
+ *  => [['h1', 'h2', 'h3'], ['v11', 'v12', ''], ['v21', 'v22', '']]
  */
 const arrsAddedDefaults = (arrs: any[], defaults = {}, isPush = false) => {
   const addKeys = Object.keys(defaults);
@@ -305,59 +305,90 @@ const arrsAddedDefaults = (arrs: any[], defaults = {}, isPush = false) => {
 };
 
 /**
- * Main Converter
- * @remarks
- * format coverter(string, arrays, dicts)
+ * Dicts From Arrs
+ *
+ * @example
+ * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']])
+ *  => [{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}]
  */
-const convertStr = (data: string, srcType: string, dstType: string) => {
-  // return tsvFromSrt(data);
-  if (srcType == "srt" && dstType == "tsv") {
-    return tsvFromSrt(data);
-  } else if (srcType == "tsv" && dstType == "srt") {
-    return srtFromTsv(data);
+const dictsFromArrs = (arrs: any[][]) => {
+  let dicts: any[] = [];
+  const header = arrs[0];
+  for (let arr of arrs.slice(1)) {
+    let dict: any = {};
+    for (let i = 0; i < header.length; i++) {
+      dict[header[i]] = arr[i] || "";
+    }
+    dicts.push(dict);
   }
+  return dicts;
 };
 
-// & Dict, Dicts
-// /**
-//  * Swap Dict Key-Value
-//  *
-//  * @example
-//  * swapDict({a: 1, b: 2})
-//  * =>{'1': 'a', '2': 'b'}
-//  */
-// function swapDict(dict: any) {
-//   var ret = {};
-//   for (var key in dict) {
-//     ret[dict[key]] = key;
-//   }
-//   return ret;
-// }
+/**
+ * Swap Dict Key-Value
+ *
+ * @example
+ * swapDict({a: 1, b: 2})
+ * => {'1': 'a', '2': 'b'}
+ */
+const swapDict = (dict: any) => {
+  let ret: any = {};
+  for (let key in dict) {
+    ret[dict[key]] = key;
+  }
+  return ret;
+};
 
-// /**
-//  * Get Upsert Dicts
-//  *
-//  * @param olds - 원본 dicts
-//  * @param news - 출력 dicts
-//  * @param keys - (동일여부) 비교 대상 keys
-//  *
-//  * @example
-//  *
-//  * const olds = [{a: 1, b: 2, c: 3}, {a: 4, b: 5, c: 6}, {a: 4, b: 6, c: 9}]
-//  * const news = [{a: 1, b: 2, d: 3}, {a: 4, b: 6, d: 8}, {a: 4, b: 8, d: 10}]
-//  * const keys = ['a', 'b']
-//  * let upserts = getUpsertDicts(olds, news, keys)
-//  *
-//  * => upserts
-//  * upserts.adds = [{a: 4, b: 8, d: 10}]  // dicts exist in news, but not exist in olds for keys['a', 'b']. {a: 4, b: 8} is
-//  * upserts.dels = [{a: 4, b: 5, c: 6}]  // dicts not exist in news, but not exist in olds for keys['a', 'b']. {a: 4, b: 5} is in `news`, but is not in `olds`
-//  * upserts.upds = [{a: 1, b: 2, d: 3}, {a: 4, b: 6, d: 8}]  // dicts exist in news, and exist in olds for keys['a', 'b']. {a: 1, b: 2}, {a: 4, b: 6} are in `news`, `olds`.
-//  */
-// function getUpsertDicts(olds: any[] = [], news: any[] = [], keys: any[]) {
+/**
+ * Get Upsert Dicts
+ * @param olds - 원본 dicts
+ * @param news - 출력 dicts
+ * @param keys - (동일여부) 비교 대상 keys
+ *
+ * @example
+ * const olds = [{a: 1, b: 2, c: 3}, {a: 4, b: 5, c: 6}, {a: 4, b: 6, c: 9}]
+ * const news = [{a: 1, b: 2, d: 3}, {a: 4, b: 6, d: 8}, {a: 4, b: 8, d: 10}]
+ * const keys = ['a', 'b']
+ * let upserts = getUpsertDicts(olds, news, keys)
+ * => upserts
+ * upserts.adds = [{a: 4, b: 8, d: 10}]  // dicts exist in news, but not exist in olds for keys['a', 'b']. {a: 4, b: 8} is
+ * upserts.dels = [{a: 4, b: 5, c: 6}]  // dicts not exist in news, but not exist in olds for keys['a', 'b']. {a: 4, b: 5} is in `news`, but is not in `olds`
+ * upserts.upds = [{a: 1, b: 2, d: 3}, {a: 4, b: 6, d: 8}]  // dicts exist in news, and exist in olds for keys['a', 'b']. {a: 1, b: 2}, {a: 4, b: 6} are in `news`, `olds`.
+ */
+function getUpsertDicts<T extends Record<string, any>>(olds: T[] = [], news: T[] = [], keys: (keyof T)[]) {
+  const upserts = {
+    adds: [] as T[],
+    dels: [] as T[],
+    upds: [] as T[],
+  };
+
+  // Check for adds and upds dicts
+  news.forEach((newDict) => {
+    const matchingOldDict = olds.find((oldDict) => keys.every((key) => newDict[key] === oldDict[key]));
+
+    if (!matchingOldDict) {
+      upserts.adds.push(newDict);
+    } else if (!Object.entries(newDict).every(([key, value]) => matchingOldDict[key] === value)) {
+      upserts.upds.push(newDict);
+    }
+  });
+
+  // Check for dels dicts
+  olds.forEach((oldDict) => {
+    const matchingNewDict = news.find((newDict) => keys.every((key) => oldDict[key] === newDict[key]));
+
+    if (!matchingNewDict) {
+      upserts.dels.push(oldDict);
+    }
+  });
+
+  return upserts;
+}
+// function getUpsertDicts(olds: any[], news: any[], keys: any[]) {
 //   const upserts = {
-//     adds: [],
-//     dels: [],
-//     upds: [],
+//     adds: any[],
+//     dels: any[],
+//     upds: any[],
 //   };
 
 //   // Check for adds and upds dicts
@@ -365,7 +396,7 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
 //     const matchingOldDict = olds.find((oldDict) => keys.every((key) => newDict[key] === oldDict[key]));
 
 //     if (!matchingOldDict) {
-//       upserts.adds.push(newDict!);
+//       upserts.adds.push(newDict);
 //     } else if (!Object.entries(newDict).every(([key, value]) => matchingOldDict[key] === value)) {
 //       upserts.upds.push(newDict);
 //     }
@@ -385,26 +416,23 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
 
 /**
  * Remove Keys From Dict
- *
  * @param dict - 원본 dict
  * @param keys - 제거할 keys
  *
  * @example
- * let upserts = getUpsertDicts({a: 1, b: 2, c: 3}, ['a', 'c'])
- *
+ * removeDictKeys({a: 1, b: 2, c: 3}, ['a', 'c'])
  * => {b: 2}
  */
-function removeDictKeys(dict: any, keys: any[]) {
+const removeDictKeys = (dict: any, keys: any[]) => {
   for (let key of keys) {
     delete dict[key];
   }
   return dict;
-}
+};
 
-// & Data / Time
+// * Data / Time
 /**
  * Convert date string to ko-KR(yyyy년 M월 d일 (요일))
- *
  * @param {string} dateStr The function to delay.
  * @example
  *
@@ -421,7 +449,6 @@ const dateKo = (dateStr: string) =>
 
 /**
  * Get Now Date Time ()
- *
  * @param {Object} options options
  *   - timeZone: default 'Asia/Seoul'
  *   - hour12: default false
@@ -455,7 +482,6 @@ const now = (options: any) => {
  * #source: https://github.com/lodash/lodash/blob/master/delay.js
  * Invokes `func` after `wait` milliseconds. Any additional arguments are
  * provided to `func` when it's invoked.
- *
  * @param {Function} func The function to delay.
  * @param {number} wait The number of milliseconds to delay invocation.
  * @param {...*} [args] The arguments to invoke `func` with.
@@ -486,7 +512,6 @@ const sleep = (sec: number) => {
 
 /**
  * Sleep For `wait` milliseconds.
- *
  * @param {number} wait The number of milliseconds to delay invocation.
  * @example
  *
@@ -499,27 +524,32 @@ const sleepAsync = async (wait: number) => {
   await new Promise((resolve) => setTimeout(resolve, wait));
 };
 
-// & EXPORT
+// & Export AREA
+// &---------------------------------------------------------------------------
 export {
   ping, // test
   popDict, // pop for dictionary
   serializeNonPOJOs, // NonPOJO -> POJO(Plain Old Java Object) object
+  // ? string
   evalStr, // Evaluate String including `${expression}`
   tsvFromSrt, // Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
   srtFromTsv, // Convert Tab-Separated Values(`tsv`) => SubRipText(`srt`)
   arrsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)
   csvFromArrs, // arrs -> csv
+  convertStr, // convert string format
+  // ? arr, arrs, pair, pairs, dict, dicts
   arrFromArrs, // Returns arr From arrs(array of array)
   arrFromDicts, // Returns arr From dicts (extract values by key)
   dictFromPair, // Returns Dict(object) From Pair(Keys, Vals)
   dictsFromPairs, //Returns Dicts(objects) From Pairs(Keys, Valss)
   arrsFromDict, // Arrs From Dict
   arrsFromDicts, // Arrs From Dicts
+  dictsFromArrs, //Dicts From Arrs
   arrsAddedDefaults, // Arrs Added Default Values
-  convertStr, // convert string format
-  // swapDict, // Swap Dict Key-Value
-  // getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
+  swapDict, // Swap Dict Key-Value
+  getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict
+  //  ? date, time
   now,
   delay,
   sleep,

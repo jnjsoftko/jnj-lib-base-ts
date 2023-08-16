@@ -1,18 +1,33 @@
-/**
- * A library for Buitin(Package With Buitin Importing) Utility Functions
+/** sqlPocketbase
  *
- * @packageDocumentation
+ * Description
+ *   - A library for Buitin(Package With Buitin Importing) Utility Functions
  *
- * File/Folder System
+ * Functions
+ *   [X]
  *
- * Date/Time
+ * Usages
+ *   -
  *
+ * Requirements
+ *   -
+ *
+ * References
+ *   -
+ *
+ * Authors
+ *   - Moon In Learn <mooninlearn@gmail.com>
+ *   - JnJsoft Ko <jnjsoft.ko@gmail.com>
  */
-
+// & Import AREA
+// &---------------------------------------------------------------------------
+// ? Builtin Modules
 import * as fs from "fs";
 import Path from "path";
 
-// & File System
+// & Functions AREA
+// &---------------------------------------------------------------------------
+// * File System
 /**
  * remove BOM(Byte Order Mark, `U+FEFF`)
  */
@@ -165,7 +180,8 @@ const renameFilesInFolder = (folder: string, filterCb: Function, mapCb: Function
 //   ));
 // }
 
-// & EXPORT
+// & Export AREA
+// &---------------------------------------------------------------------------
 export {
   removeBOM, // remove BOM(Byte Order Mark, `U+FEFF`)
   setPath, // 상대경로->절대경로(실행 폴더 기준) './dir1/dir2' =>

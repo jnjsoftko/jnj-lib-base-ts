@@ -2,22 +2,26 @@ export {
   ping, // test
   popDict, // pop for dictionary
   serializeNonPOJOs, // NonPOJO -> POJO(Plain Old Java Object) object
+  // ? string
   evalStr, // Evaluate String including `${expression}`
   tsvFromSrt, // Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
   srtFromTsv, // Convert Tab-Separated Values(`tsv`) => SubRipText(`srt`)
   arrsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)
   csvFromArrs, // arrs -> csv
+  convertStr, // convert string format
+  // ? arr, arrs, pair, pairs, dict, dicts
   arrFromArrs, // Returns arr From arrs(array of array)
   arrFromDicts, // Returns arr From dicts (extract values by key)
   dictFromPair, // Returns Dict(object) From Pair(Keys, Vals)
   dictsFromPairs, //Returns Dicts(objects) From Pairs(Keys, Valss)
   arrsFromDict, // Arrs From Dict
   arrsFromDicts, // Arrs From Dicts
+  dictsFromArrs, //Dicts From Arrs
   arrsAddedDefaults, // Arrs Added Default Values
-  convertStr, // convert string format
-  // swapDict, // Swap Dict Key-Value
-  // getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
+  swapDict, // Swap Dict Key-Value
+  getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict
+  //  ? date, time
   now,
   delay,
   sleep,
