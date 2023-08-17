@@ -456,7 +456,7 @@ const dictsFromArrs = (arrs: any[][], maps: any = {}, dfault = "") => {
   return arrs.map((arr) => {
     let dict: any = {};
     header.forEach((h: any, i: number) => {
-      dict[maps[h] ?? h] = indexMaps[i] != -1 ? arr[indexMaps[i]] : dfault;
+      dict[maps[h] ?? h] = indexMaps[i] != -1 ? arr[indexMaps[i]] ?? dfault : dfault;
     });
     return dict;
   });
