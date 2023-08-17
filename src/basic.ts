@@ -1,58 +1,85 @@
-/**
- * A library for Basic(Package Without Importing) Utility Functions
+/** jnj-lib-base/basic
  *
+ * Description
+ *   - Function library for Basic(Without Importing Package) Utilities
  *
- * FileTypes(Extensions)
+ * Functions
+ *   [X] Check
+ *     - ping: module 사용가능한지 체크
+ *     - isEmptyDict, isEmpty, isFalsy, isValidStr
+ *   [X] FileTypes(Extensions)
  *   - srt:  SubRipText  동영상 자막용 데이터
  *   - tsv:  Tab-Separated Values  tab으로 분리된 테이블 형식 데이터
  *   - csv:  Comma-Separated Values  `comma`으로 분리된 테이블 형식 데이터
- *
- * DataTypes
+ *   [X] DataTypes
  *   - str:  String  문자열
  *   - strs:  Array of String  문자열 배열
  *   - arr:  Array  1차원 배열
  *   - arrs:  Array of Array  2차원 배열(테이블 형식 데이터)
- *   - dict:  Dictionary  key: value 쌍으로 이루어진 데이터
- *   - dicts:  Array of Dictionary  dict 배열
+ *       - `googlesheet`, `csv`에 사용
  *   - pair: [keys, vals]
  *   - pairs: [keys, valss], valss: array of vals
+ *   - dict:  Dictionary  key: value 쌍으로 이루어진 데이터.
+ *       - javascript `object`와 동일
+ *   - dicts:  Array of Dictionary  dict 배열
+ *   [X]
+ *
+ * Usages
+ *   -
+ *
+ * Requirements
+ *   -
+ *
+ * References
+ *   - https://script.google.com/home/projects/11fYg0iHuLvA42TB_spV9OLOgtT0AnKgdrT8S-3pDkBqCWItgeflggOhw/edit
+ *
+ * Authors
+ *   - Moon In Learn <mooninlearn@gmail.com>
+ *   - JnJsoft Ko <jnjsoft.ko@gmail.com>
  */
-
 // & Functions AREA
 // &---------------------------------------------------------------------------
-// * test
+// * types
+// type Str = string | undefined | null;
+
+// * Test
 /**
  * Ping(Test)
  */
 const ping = () => "pong";
 
-// * types
-// type Str = string | undefined | null;
+// * Check
+/**
+ * Check Dict Empty(`{}`)
+ * @remarks
+ *  - method1: _.isEmpty(obj)
+ *  - method2: obj && Object.keys(obj).length === 0 && obj.constructor === Object
+ *  -
+ */
+const isEmptyDict = (obj: any) => JSON.stringify(obj) === "{}";
 
-// * isTruthy, isFalsy, isValidStr, isEmpty
-// const isFalsy = (v: any) => {
-//   return (v === false || v === undefined || v === null || Number.isNaN(v) || v === 0 || v.length === 0 || Object.keys(v).length === 0)
-// }
+/**
+ * Check Empty Dict or Arr(`[]`)
+ * @remarks
+ */
+const isEmpty = (v: any) => JSON.stringify(v) === "{}" || JSON.stringify(v) === "[]";
 
-// const isTruthy = (v: any) => {
-//   return (v !== false && v !== undefined && v !== null && !Number.isNaN(v) && v !== 0 && v.length !== 0 && Object.keys(v).length !== 0)
-// }
+/**
+ * Check Falsy
+ * @remarks
+ *  - method1: _falsey(v) || _.isEmpty(v)
+ */
+const isFalsy = (v: any) => {
+  return v === false || v === undefined || v === null || Number.isNaN(v) || v === 0 || v.length === 0 || Object.keys(v).length === 0;
+};
 
-// const isValidStr = (val) => {
-//   return !(val === null || val.trim() === '' || typeof val !== 'string');
-// };
-
-// const isEmpty = (val) => {
-//   if (val === null) {
-//     return true;
-//   } else if (typeof val === 'string') {
-//     return val.trim() === '';
-//   } else if (Array.isArray(val)) {
-//     return val.length === 0;
-//   } else if (typeof val === 'object') {
-//     return Object.keys(val).length === 0;
-//   }
-// };
+/**
+ * Check String Valid
+ * @remarks
+ */
+const isValidStr = (s: any) => {
+  return !(s === null || s.trim() === "" || typeof s !== "string");
+};
 
 // * Convert Object
 /**
@@ -79,6 +106,11 @@ const evalStr = (str: string, values: any) => {
     return value;
   });
 };
+
+/**
+ * String From Any Data
+ */
+const strFromAny = (s: any) => (typeof s == "string" ? s.trim() : JSON.stringify(s));
 
 /**
  * Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
@@ -167,7 +199,7 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
   }
 };
 
-// * Arr, Arrs, Dict, Dicts
+// * Arr, Arrs, Pair, Pairs, Dict, Dicts
 /**
  * Returns arr From arrs(array of array).
  *
@@ -185,18 +217,6 @@ const arrFromArrs = (arrs: any[], index = 0, hasHeader = false) => {
 };
 
 /**
- * Arr From Dicts(Extract array By Key)
- * @param dicts - source dicts
- *
- * @example
- *  arrFromDicts([{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}], 'h1')
- *   => ['v11', 'v21']
- */
-const arrFromDicts = (dicts: any[], key: string) => {
-  return dicts.map((dict) => dict[key]);
-};
-
-/**
  * Pop Dict By Key
  * @param obj - dict
  * @param key - string
@@ -209,6 +229,111 @@ const popDict = (obj: any, key: string) => {
   let val = obj[key];
   delete obj[key];
   return val;
+};
+
+/**
+ * New Dict Keys(maps의 key들에 대해, 변경된 key 이름으로 dict 생성)
+ * @param obj - dict
+ * @param maps - mapping dict for rename keys
+ * @param defaults - obj에 없는 key(maps에만 있는)에 대한 default값
+ * @param dfault - defaults에 없을 때의 default값
+ *
+ * @example
+ * newKeys({ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 'a1', 'c': 'c1', 'd': 'd1' }, {'d1': ''})
+ * => { a1: 1, c1: 3, d1: '' }
+ */
+const newKeys = (obj: Record<string, any>, maps: Record<string, string>, defaults: Record<string, any>, dfault = "") => {
+  return Object.keys(maps).reduce(function (obj_, key) {
+    obj_[maps[key]] = obj[key] ?? defaults[key] ?? dfault;
+    return obj_;
+  }, {} as Record<string, any>);
+};
+
+/**
+ * Rename Dict Keys(obj의 key들에 대한 이름 변경(변경 되지 않은 것은 유지))
+ * @param obj - dict
+ * @param maps - mapping dict for rename keys
+ *
+ * @example
+ * renameKeys({ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 'a1', 'c': 'c1', 'd': 'd1' })
+ * =>
+ * { a1: 1, b: 2, c1: 3 }
+ */
+const renameKeys = (obj: Record<string, any>, maps: Record<string, string>) => {
+  return Object.keys(obj).reduce(function (obj_, key) {
+    obj_[maps[key] ?? key] = obj[key];
+    return obj_;
+  }, {} as Record<string, any>);
+};
+
+/**
+ * Overwrite Dict Keys(newKeys(신규 key 추가) + rename(key 이름 변경))
+ * @param obj - dict
+ * @param maps - mapping dict for rename keys
+ * @param defaults - obj에 없는 key(maps에만 있는)에 대한 default값
+ * @param dfault - defaults에 없을 때의 default값
+ *
+ * @example
+ * overwriteKeys({ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 'a1', 'c': 'c1', 'd': 'd1' }, {'d1': ''})
+ * =>
+ *  { a1: 1, b: 2, c1: 3, d1: '' }
+ */
+const overwriteKeys = (obj: Record<string, any>, maps: Record<string, string>, defaults: Record<string, any>, dfault = "") => {
+  return Object.keys({ ...obj, ...defaults }).reduce(function (obj_, key) {
+    obj_[maps[key] ?? key] = obj[key] ?? defaults[key] ?? dfault;
+    return obj_;
+  }, {} as Record<string, any>);
+};
+
+/**
+ * Update Dict Keys
+ * @param obj - dict
+ * @param maps - mapping dict for rename keys
+ * @param defaults - obj에 없는 key(maps에만 있는)에 대한 default값
+ * @param dfault - defaults에 없을 때의 default값
+ * @param method
+ *  - new: maps의 key들로만 신규 생성
+ *  - rename: obj의 key들에 대한 이름 변경(변경 되지 않은 것은 유지)
+ *  - update: new + update(obj 이름 변경, 신규 key 추가)
+ *
+ * @example
+ * const dict = { 'a': 1, 'b': 2, 'c': 3 }
+ * const maps = { 'a': 'a1', 'c': 'c1', 'd': 'd1' }
+ * const defaults = {'d1': ''}
+ * const method = 'new' | 'rename' | 'update';
+ * updateKeys(dict, maps, defaults, method)
+ * =>
+ * - { a1: 1, c1: 3, d1: '' } <= method = 'new'
+ * - { a1: 1, b: 2, c1: 3 } <= method = 'rename'
+ * - { a1: 1, b: 2, c1: 3, d1: '' } <= method = 'update'
+ */
+const updateKeys = (obj: Record<string, any>, maps: Record<string, string>, defaults: Record<string, any>, dfault = "", method = "new") => {
+  let _obj = maps; // method: `new`
+  switch (method.toLowerCase()) {
+    case "rename":
+      _obj = obj;
+      break;
+    case "update":
+      _obj = { ...obj, ...defaults };
+      break;
+  }
+
+  return Object.keys(_obj).reduce(function (obj_, key) {
+    obj_[maps[key] ?? key] = obj[key] ?? defaults[key] ?? dfault;
+    return obj_;
+  }, {} as Record<string, any>);
+};
+
+/**
+ * Arr From Dicts(Extract array By Key)
+ * @param dicts - source dicts
+ *
+ * @example
+ *  arrFromDicts([{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}], 'h1')
+ *   => ['v11', 'v21']
+ */
+const arrFromDicts = (dicts: any[], key: string) => {
+  return dicts.map((dict) => dict[key]);
 };
 
 /**
@@ -248,39 +373,45 @@ const dictsFromPairs = (keys: any[], valss: any[][]) => {
 
 /**
  * Arrs From Dict
- * @param dict - source dict
+ * @param obj - source dict
  * @example
  * arrsFromDict({'h1': 'v11', 'h1': 'v12'})
  *  => [['h1', 'h2'], ['v11', 'v12']]
  */
-const arrsFromDict = (dct: any) => {
-  if (dct === null || typeof dct !== "object") {
+const arrsFromDict = (obj: any) => {
+  if (obj === null || typeof obj !== "object") {
     return [];
   }
-  const keys = Object.keys(dct);
-  const values = Object.values(dct);
-  return [keys, values];
+  return [Object.keys(obj), Object.values(obj)];
 };
 
 /**
  * Arrs From Dicts
  * @param dicts - source dicts
- *
+ * @param header - header로 사용할 key 배열(순서)
+ *   - key 이름을 변경하는 maps를 적용하려면, 순서가 적용되지 않음
+ *   - key 이름 변경은 arrsFromDicts 처리후 arrs[0] 배열값 변경
+ * @param dfault - header에 dicts[0]에 없는 key가 있는 경우, default값
  * @example
- * arrsFromDicts([{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}])
- *  => [['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']]
+ * arrsFromDicts([{'h1': 'v11', 'h2': 'v12', 'h3': 'v13'}, {'h1': 'v21', 'h2': 'v22', 'h3': 'v13'}], ['h3', 'h4', 'h1'])
+ *  => [[ 'h3', 'h4', 'h1' ],[ 'v13', '_v_', 'v11' ],[ 'v13', '_v_', 'v21' ]]
  */
-const arrsFromDicts = (dicts: any[]) => {
-  const arrs = [];
-  if (dicts === null || dicts.length === 0) {
-    return [];
+const arrsFromDicts = (dicts: any[], header: string[] = [], dfault = "") => {
+  if (!dicts || dicts.length == 0) {
+    return header;
   }
-  const keys = Object.keys(dicts[0]);
-  arrs.push(keys);
-  dicts.forEach((dict) => {
-    const row = keys.map((key) => dict[key]);
-    arrs.push(row);
-  });
+  if (!header || header.length == 0) {
+    header = Object.keys(dicts[0]);
+  }
+
+  let arrs = [header];
+  for (let row of dicts) {
+    let content = [];
+    for (let h of header) {
+      content.push(row[h] ?? dfault);
+    }
+    arrs.push(content);
+  }
   return arrs;
 };
 
@@ -306,23 +437,48 @@ const arrsAddedDefaults = (arrs: any[], defaults = {}, isPush = false) => {
 
 /**
  * Dicts From Arrs
- *
+ * @param arrs - source arrs
+ * @param maps - key mapping {'oldKey1': 'newKey1', ...}
+ * @param dfault - arrs에 없는 key인 경우 default값
  * @example
- * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']])
- *  => [{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}]
+ * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']],  {'h1': '_h1', 'h3': '_h3', 'h2': '_h2'})
+ *  => [{ _h1: 'v11', _h3: '', _h2: 'v12' }, { _h1: 'v21', _h3: '', _h2: 'v22' }]
  */
-const dictsFromArrs = (arrs: any[][]) => {
-  let dicts: any[] = [];
-  const header = arrs[0];
-  for (let arr of arrs.slice(1)) {
-    let dict: any = {};
-    for (let i = 0; i < header.length; i++) {
-      dict[header[i]] = arr[i] || "";
-    }
-    dicts.push(dict);
+const dictsFromArrs = (arrs: any[][], maps: any = {}, dfault = "") => {
+  let _header: any[] = arrs.shift()!;
+  let header = _header;
+  // if (!isEmpty(maps)) header = Object.keys(maps);
+  if (JSON.stringify(maps) != "{}") {
+    header = Object.keys(maps);
   }
-  return dicts;
+
+  const indexMaps = header.map((h) => _header.indexOf(h));
+  return arrs.map((arr) => {
+    let dict: any = {};
+    header.forEach((h: any, i: number) => {
+      dict[maps[h] ?? h] = indexMaps[i] != -1 ? arr[indexMaps[i]] : dfault;
+    });
+    return dict;
+  });
 };
+
+// /**
+//  * Dicts From Arrs
+//  *
+//  * @example
+//  * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']])
+//  *  => [{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}]
+//  */
+// const dictsFromArrs = (arrs: any[][]) => {
+//   let header: any[] = arrs.shift()!;
+//   return arrs.map(arr => {
+//     let dict: any = {};
+//     header.forEach((h: any, i: number) => {
+//       dict[h] = arr[i];
+//     });
+//     return dict;
+//   });
+// };
 
 /**
  * Swap Dict Key-Value
