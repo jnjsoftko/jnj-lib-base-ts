@@ -386,36 +386,6 @@ const arrsFromDict = (obj: any) => {
 };
 
 /**
- * Arrs From Dicts
- * @param dicts - source dicts
- * @param header - header로 사용할 key 배열(순서)
- *   - key 이름을 변경하는 maps를 적용하려면, 순서가 적용되지 않음
- *   - key 이름 변경은 arrsFromDicts 처리후 arrs[0] 배열값 변경
- * @param dfault - header에 dicts[0]에 없는 key가 있는 경우, default값
- * @example
- * arrsFromDicts([{'h1': 'v11', 'h2': 'v12', 'h3': 'v13'}, {'h1': 'v21', 'h2': 'v22', 'h3': 'v13'}], ['h3', 'h4', 'h1'])
- *  => [[ 'h3', 'h4', 'h1' ],[ 'v13', '_v_', 'v11' ],[ 'v13', '_v_', 'v21' ]]
- */
-const arrsFromDicts = (dicts: any[], header: string[] = [], dfault = "") => {
-  if (!dicts || dicts.length == 0) {
-    return header;
-  }
-  if (!header || header.length == 0) {
-    header = Object.keys(dicts[0]);
-  }
-
-  let arrs = [header];
-  for (let row of dicts) {
-    let content = [];
-    for (let h of header) {
-      content.push(row[h] ?? dfault);
-    }
-    arrs.push(content);
-  }
-  return arrs;
-};
-
-/**
  * Arrs Added Default Values
  * @param arrs - given arrs
  * @param defaults - added default values
@@ -436,49 +406,77 @@ const arrsAddedDefaults = (arrs: any[], defaults = {}, isPush = false) => {
 };
 
 /**
+ * headerIndexArr
+ *   - newKeys
+ *   - pair의 key에 해당하는 oldHeader의 index(-1: oldHeader에는 없는 key)
+ * @param oldHeader - source arrs
+ * @param pair - key mapping [['oldKey1', ...], ['newKey1', ...]]
+ * @example
+ * headerIndexArr(['h1', 'h2', 'h3'],  [['h3', 'h4', 'h1'], ['_h3', '_h4', '_h1']])
+ *  => [['_h3', '_h4', '_h1'], [2, -1, 0]]
+ */
+const headerIndexArr = (oldHeader: any[], pair: any[][]) => {
+  let newHeader = oldHeader;
+  let indexArr = [...Array(oldHeader.length).keys()];
+  if (pair) {
+    newHeader = pair[1];
+    indexArr = pair[0].map((h) => oldHeader.indexOf(h));
+  }
+  return [newHeader, indexArr];
+};
+
+/**
  * Dicts From Arrs
  * @param arrs - source arrs
- * @param maps - key mapping {'oldKey1': 'newKey1', ...}
+ * @param pair - key mapping [['oldKey1', ...], ['newKey1', ...]]
  * @param dfault - arrs에 없는 key인 경우 default값
  * @example
- * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']],  {'h1': '_h1', 'h3': '_h3', 'h2': '_h2'})
- *  => [{ _h1: 'v11', _h3: '', _h2: 'v12' }, { _h1: 'v21', _h3: '', _h2: 'v22' }]
+ * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']],  [['h2', 'h3', 'h1'], ['_h2', '_h3', '_h1']])
+ *  => [{ _h2: 'v12', _h3: '', _h1: 'v11' }, { _h2: 'v22', _h3: '', _h1: 'v21' }]  // 순서는 의미가 없을 수 있음
  */
-const dictsFromArrs = (arrs: any[][], maps: any = {}, dfault = "") => {
-  let _header: any[] = arrs.shift()!;
-  let header = _header;
-  // if (!isEmpty(maps)) header = Object.keys(maps);
-  if (JSON.stringify(maps) != "{}") {
-    header = Object.keys(maps);
+const dictsFromArrs = (arrs: any[][], pair: any[][], dfault = "") => {
+  if (!arrs || arrs.length == 0) {
+    return [];
   }
+  let [header, indexMaps] = headerIndexArr(arrs.shift()!, pair);
 
-  const indexMaps = header.map((h) => _header.indexOf(h));
   return arrs.map((arr) => {
     let dict: any = {};
     header.forEach((h: any, i: number) => {
-      dict[maps[h] ?? h] = indexMaps[i] != -1 ? arr[indexMaps[i]] ?? dfault : dfault;
+      dict[h] = indexMaps[i] != -1 ? arr[indexMaps[i]] ?? dfault : dfault;
     });
     return dict;
   });
 };
 
-// /**
-//  * Dicts From Arrs
-//  *
-//  * @example
-//  * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']])
-//  *  => [{'h1': 'v11', 'h1': 'v12'}, {'h1': 'v21', 'h1': 'v22'}]
-//  */
-// const dictsFromArrs = (arrs: any[][]) => {
-//   let header: any[] = arrs.shift()!;
-//   return arrs.map(arr => {
-//     let dict: any = {};
-//     header.forEach((h: any, i: number) => {
-//       dict[h] = arr[i];
-//     });
-//     return dict;
-//   });
-// };
+/**
+ * Arrs From Dicts
+ * @param dicts - source dicts
+ * @param pair - key mapping [['oldKey1', ...], ['newKey1', ...]]
+ * @param dfault - arrs에 없는 key인 경우 default값
+ * @example
+ * arrsFromDicts([{'h1': 'v11', 'h2': 'v12', 'h3': 'v13'}, {'h1': 'v21', 'h2': 'v22', 'h3': 'v13'}], [['h3', 'h4', 'h1'], ['_h3', '_h4', '_h1']], '_v_')
+ *  => [[ '_h3', '_h4', '_h1' ], [ 'v13', '_v_', 'v11' ], [ 'v13', '_v_', 'v21' ]]
+ */
+const arrsFromDicts = (dicts: any[], pair: any[][], dfault = "") => {
+  if (!dicts || dicts.length == 0) {
+    return [];
+  }
+
+  const _header = Object.keys(dicts[0]);
+  let [header, indexMaps] = headerIndexArr(_header, pair);
+
+  let arrs = [header];
+  for (let row of dicts) {
+    let content = [];
+    for (let i = 0; i < header.length; i++) {
+      const i_ = indexMaps[i];
+      i_ == -1 ? content.push(dfault) : content.push(row[_header[i_]]);
+    }
+    arrs.push(content);
+  }
+  return arrs;
+};
 
 /**
  * Swap Dict Key-Value
@@ -487,13 +485,20 @@ const dictsFromArrs = (arrs: any[][], maps: any = {}, dfault = "") => {
  * swapDict({a: 1, b: 2})
  * => {'1': 'a', '2': 'b'}
  */
-const swapDict = (dict: any) => {
-  let ret: any = {};
-  for (let key in dict) {
-    ret[dict[key]] = key;
-  }
-  return ret;
+const swapDict = (obj: Record<any, any>) => {
+  return Object.keys(obj).reduce((obj_: Record<any, any>, key: any) => {
+    obj_[obj[key]] = key;
+    return obj_;
+  }, {});
 };
+
+// const swapDict = (dict: any) => {
+//   let ret: any = {};
+//   for (let key in dict) {
+//     ret[dict[key]] = key;
+//   }
+//   return ret;
+// };
 
 /**
  * Get Upsert Dicts
