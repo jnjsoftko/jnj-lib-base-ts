@@ -10,6 +10,10 @@ export {
   csvFromArrs, // arrs -> csv
   convertStr, // convert string format
   // ? arr, arrs, pair, pairs, dict, dicts
+  newKeys, // New Dict Keys(maps의 key들에 대해, 변경된 key 이름으로 dict 생성)
+  renameKeys, // Rename Dict Keys(obj의 key들에 대한 이름 변경(변경 되지 않은 것은 유지))
+  overwriteKeys, //Overwrite Dict Keys(newKeys(신규 key 추가) + rename(key 이름 변경))
+  updateKeys, // Update Dict Keys
   arrFromArrs, // Returns arr From arrs(array of array)
   arrFromDicts, // Returns arr From dicts (extract values by key)
   dictFromPair, // Returns Dict(object) From Pair(Keys, Vals)
