@@ -45,6 +45,9 @@ export {
   findFilesRecusive, // 파일 목록(recursive)
   // findFileList, // 파일 목록(filter, map)
   existsFolder, // 폴더 존재여부
+  fixFolderName,
+  moveFile,
+  moveFiles,
   // renameFilesInFolder
 } from "./builtin.js";
 

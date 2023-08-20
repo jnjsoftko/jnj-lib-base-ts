@@ -157,6 +157,40 @@ const findFilesRecusive = (folder: string, arrayOfFiles: string[] = []) => {
 const existsFolder = (folder: string) => fs.existsSync(folder);
 
 /**
+ * fixFolderName
+ * @param folderName
+ */
+const fixFolderName = (folderName: string) => {
+  folderName = folderName.replace("\\", "/").replace("//", "/");
+  return folderName.endsWith("/") ? folderName.slice(0, -1) : folderName;
+};
+
+/**
+ * moveFile
+ */
+const moveFile = (srcFolderName: string, dstFolderName: string, srcFileName: string, dstFileName: string) => {
+  srcFolderName = fixFolderName(srcFolderName);
+  dstFolderName = fixFolderName(dstFolderName);
+
+  fs.rename(`${srcFolderName}/${srcFileName}`, `${dstFolderName}/${dstFileName}`, (err) => console.log(err));
+};
+
+/**
+ * moveFiles
+ */
+const moveFiles = (srcFolderName: string, dstFolderName: string, srcFileNames: string[], dstFileNames: string[]) => {
+  srcFolderName = fixFolderName(srcFolderName);
+  dstFolderName = fixFolderName(dstFolderName);
+
+  !fs.existsSync(dstFolderName) && fs.mkdirSync(dstFolderName, { recursive: true });
+  for (let i = 0; i < srcFileNames.length; i++) {
+    const srcFileName = srcFileNames[i];
+    const dstFileName = dstFileNames[i];
+    fs.rename(`${srcFolderName}/${srcFileName}`, `${dstFolderName}/${dstFileName}`, (err) => console.log(err));
+  }
+};
+
+/**
  * rename Files In Folder
  * @param folder
  * @param  filterCb
@@ -202,5 +236,8 @@ export {
   findFilesRecusive, // 파일 목록(recursive)
   // findFileList, // 파일 목록(filter, map)
   existsFolder, // 폴더 존재여부
+  fixFolderName,
+  moveFile,
+  moveFiles,
   // renameFilesInFolder
 };
