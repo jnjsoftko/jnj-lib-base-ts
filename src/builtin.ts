@@ -109,6 +109,7 @@ const cpdir = (srcDir: string, dstDir: string, recursive = true) => {
  * @param folder
  */
 const findFiles = (folder: string) => {
+  if (!fs.existsSync(folder)) return [];
   return fs
     .readdirSync(folder, { withFileTypes: true })
     .filter((item) => !item.isDirectory())
@@ -121,6 +122,7 @@ const findFiles = (folder: string) => {
  * @param  arrayOfFiles
  */
 const findFilesRecusive = (folder: string, arrayOfFiles: string[] = []) => {
+  if (!fs.existsSync(folder)) return [];
   const files = fs.readdirSync(folder);
   arrayOfFiles = arrayOfFiles || [];
 
@@ -148,6 +150,11 @@ const findFilesRecusive = (folder: string, arrayOfFiles: string[] = []) => {
 //     .map((name) => mapCb(name));
 //   // return fs.readdirSync(`${process.env.ROOT_DIR}/${folder}`).filter((name)=> name.endsWith('.ts')).map((name) => `${folder}/${name}`);
 // };
+
+/**
+ * exists Folder(폴더 존재여부)
+ */
+const existsFolder = (folder: string) => fs.existsSync(folder);
 
 /**
  * rename Files In Folder
@@ -194,5 +201,6 @@ export {
   findFiles, // 파일 목록
   findFilesRecusive, // 파일 목록(recursive)
   // findFileList, // 파일 목록(filter, map)
+  existsFolder, // 폴더 존재여부
   // renameFilesInFolder
 };
