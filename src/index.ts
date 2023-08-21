@@ -4,6 +4,8 @@ export {
   serializeNonPOJOs, // NonPOJO -> POJO(Plain Old Java Object) object
   // ? string
   evalStr, // Evaluate String including `${expression}`
+  includesMulti, // Check Includes at Multiple String(array)
+  strFromAny, // String From Any Data
   tsvFromSrt, // Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
   srtFromTsv, // Convert Tab-Separated Values(`tsv`) => SubRipText(`srt`)
   arrsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)

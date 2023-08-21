@@ -108,6 +108,21 @@ const evalStr = (str: string, values: any) => {
 };
 
 /**
+ * Check Includes at Multiple String(array)
+ *
+ * @example
+ * includesMulti('abcde', ['f', 'c']) => true
+ */
+const includesMulti = (s: string, arr: string[]) => {
+  for (let a of arr) {
+    if (s.includes(a)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
  * String From Any Data
  */
 const strFromAny = (s: any) => (typeof s == "string" ? s.trim() : JSON.stringify(s));
@@ -693,6 +708,8 @@ export {
   serializeNonPOJOs, // NonPOJO -> POJO(Plain Old Java Object) object
   // ? string
   evalStr, // Evaluate String including `${expression}`
+  includesMulti, // Check Includes at Multiple String(array)
+  strFromAny, // String From Any Data
   tsvFromSrt, // Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
   srtFromTsv, // Convert Tab-Separated Values(`tsv`) => SubRipText(`srt`)
   arrsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)
