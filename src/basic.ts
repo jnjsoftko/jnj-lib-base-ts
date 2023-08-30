@@ -15,10 +15,13 @@
  *   - str:  String  문자열
  *   - strs:  Array of String  문자열 배열
  *   - arr:  Array  1차원 배열
- *   - arrs:  Array of Array  2차원 배열(테이블 형식 데이터)
+ *   - arrs: Array of Array(Row)  2차원 배열(테이블 형식 데이터)
+ *   - rows:  Array of Array(Row)  2차원 배열(테이블 형식 데이터)
+ *       - row의 size가 모두 같고, n번째 값의 data type이 동일
+ *       - 첫번째 row는 header로 사용될 수 있음
  *       - `googlesheet`, `csv`에 사용
- *   - pair: [keys, vals]
- *   - pairs: [keys, valss], valss: array of vals
+ *   - duo: [keys, vals] | keys, vals
+ *   - duos: [keys, valss], valss: array of vals | keys, valss
  *   - dict:  Dictionary  key: value 쌍으로 이루어진 데이터.
  *       - javascript `object`와 동일
  *   - dicts:  Array of Dictionary  dict 배열
@@ -145,7 +148,7 @@ const srtFromTsv = (str: string) => {
 };
 
 /**
- * Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)
+ * Convert Comma-Separated Values(`csv`) => Array of Array(`rows`)
  * @param csv - csv string
  * @param sep - csv seperator / default=','
  * @param hasQuote
@@ -155,46 +158,46 @@ const srtFromTsv = (str: string) => {
  * csv = `"a "," b","c"
  * "1","2","3"
  * "4","5","6"`
- * arrsFromCsv(csv)
+ * rowsFromCsv(csv)
  *  => [["a", "b", "c"], ["1","2","3"], ["4","5","6"]]
  */
-const arrsFromCsv = (csv: string, sep = ",", hasQuote = true, newline = "\n") => {
-  const arrs = [];
+const rowsFromCsv = (csv: string, sep = ",", hasQuote = true, newline = "\n") => {
+  const rows = [];
   for (const line of csv.split(newline)) {
     if (hasQuote) {
-      arrs.push(
+      rows.push(
         line
           .slice(1, -1)
           .split(`"${sep}"`)
           .map((s) => s.trim())
       );
     } else {
-      arrs.push(line.split(sep).map((s) => s.trim()));
+      rows.push(line.split(sep).map((s) => s.trim()));
     }
   }
-  return arrs;
+  return rows;
 };
 
 /**
- * Array of Array(`arrs`) => Convert Comma-Separated Values(`csv`)
- * @param arrs -
+ * Array of Array(`rows`) => Convert Comma-Separated Values(`csv`)
+ * @param rows -
  * @param sep - csv seperator / default=','
  * @param hasQuote
  * @param newline
  *
  * @example
- * csvFromArrs([["a", "b", "c"], ["1","2","3"], ["4","5","6"]])
+ * csvFromRows([["a", "b", "c"], ["1","2","3"], ["4","5","6"]])
  *  => `"a "," b","c"
  * "1","2","3"
  * "4","5","6"`
  */
-const csvFromArrs = (arrs: any, sep = ",", hasQuote = true, newline = "\n") => {
+const csvFromRows = (rows: any, sep = ",", hasQuote = true, newline = "\n") => {
   let str = "";
-  for (const arr of arrs) {
+  for (const row of rows) {
     if (hasQuote) {
-      str += `"${arr.join('"' + sep + '"')}"${newline}`;
+      str += `"${row.join('"' + sep + '"')}"${newline}`;
     } else {
-      str += `${arr.join(sep)}${newline}`;
+      str += `${row.join(sep)}${newline}`;
     }
   }
   return str;
@@ -214,7 +217,7 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
   }
 };
 
-// * Arr, Arrs, Pair, Pairs, Dict, Dicts
+// * Arr, Arrs, Rows, Duo, Duos, Dict, Dicts
 /**
  * Returns arr From arrs(array of array).
  *
@@ -223,11 +226,11 @@ const convertStr = (data: string, srcType: string, dstType: string) => {
  * @hasHeader - has header (bool)
  *
  * @example
- * arrFromArrs([[1, 2, 3], [4, 5, 6]], 1)
+ * arrFromRows([[1, 2, 3], [4, 5, 6]], 1)
  *  => [2, 5]
  */
-const arrFromArrs = (arrs: any[], index = 0, hasHeader = false) => {
-  const arr = arrs.map((c) => c[index]);
+const arrFromArrs = (rows: any[], index = 0, hasHeader = false) => {
+  const arr = rows.map((c) => c[index]);
   return hasHeader ? arr.slice(1) : arr;
 };
 
@@ -241,25 +244,25 @@ const arrFromArrs = (arrs: any[], index = 0, hasHeader = false) => {
  *  => {'b': 2}
  */
 const popDict = (obj: any, key: string) => {
-  let val = obj[key];
+  // let val = obj[key];
   delete obj[key];
-  return val;
+  return obj;
 };
 
 /**
  * New Dict Keys(maps의 key들에 대해, 변경된 key 이름으로 dict 생성)
  * @param obj - dict
  * @param maps - mapping dict for rename keys
- * @param defaults - obj에 없는 key(maps에만 있는)에 대한 default값
- * @param dfault - defaults에 없을 때의 default값
+ * @param valMap - obj에 없는 key(maps에만 있는)에 대한 default값
+ * @param dfault - valMap에 없을 때의 default값
  *
  * @example
  * newKeys({ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 'a1', 'c': 'c1', 'd': 'd1' }, {'d1': ''})
  * => { a1: 1, c1: 3, d1: '' }
  */
-const newKeys = (obj: Record<string, any>, maps: Record<string, string>, defaults: Record<string, any>, dfault = "") => {
+const newKeys = (obj: Record<string, any>, maps: Record<string, string>, valMap: Record<string, any>, dfault = "") => {
   return Object.keys(maps).reduce(function (obj_, key) {
-    obj_[maps[key]] = obj[key] ?? defaults[key] ?? dfault;
+    obj_[maps[key]] = obj[key] ?? valMap[key] ?? dfault;
     return obj_;
   }, {} as Record<string, any>);
 };
@@ -285,17 +288,17 @@ const renameKeys = (obj: Record<string, any>, maps: Record<string, string>) => {
  * Overwrite Dict Keys(newKeys(신규 key 추가) + rename(key 이름 변경))
  * @param obj - dict
  * @param maps - mapping dict for rename keys
- * @param defaults - obj에 없는 key(maps에만 있는)에 대한 default값
- * @param dfault - defaults에 없을 때의 default값
+ * @param valMap - obj에 없는 key(maps에만 있는)에 대한 default값
+ * @param dfault - valMap에 없을 때의 default값
  *
  * @example
  * overwriteKeys({ 'a': 1, 'b': 2, 'c': 3 }, { 'a': 'a1', 'c': 'c1', 'd': 'd1' }, {'d1': ''})
  * =>
  *  { a1: 1, b: 2, c1: 3, d1: '' }
  */
-const overwriteKeys = (obj: Record<string, any>, maps: Record<string, string>, defaults: Record<string, any>, dfault = "") => {
-  return Object.keys({ ...obj, ...defaults }).reduce(function (obj_, key) {
-    obj_[maps[key] ?? key] = obj[key] ?? defaults[key] ?? dfault;
+const overwriteKeys = (obj: Record<string, any>, maps: Record<string, string>, valMap: Record<string, any>, dfault = "") => {
+  return Object.keys({ ...obj, ...valMap }).reduce(function (obj_, key) {
+    obj_[maps[key] ?? key] = obj[key] ?? valMap[key] ?? dfault;
     return obj_;
   }, {} as Record<string, any>);
 };
@@ -304,8 +307,8 @@ const overwriteKeys = (obj: Record<string, any>, maps: Record<string, string>, d
  * Update Dict Keys
  * @param obj - dict
  * @param maps - mapping dict for rename keys
- * @param defaults - obj에 없는 key(maps에만 있는)에 대한 default값
- * @param dfault - defaults에 없을 때의 default값
+ * @param valMap - obj에 없는 key(maps에만 있는)에 대한 default값
+ * @param dfault - valMap에 없을 때의 default값
  * @param method
  *  - new: maps의 key들로만 신규 생성
  *  - rename: obj의 key들에 대한 이름 변경(변경 되지 않은 것은 유지)
@@ -314,27 +317,27 @@ const overwriteKeys = (obj: Record<string, any>, maps: Record<string, string>, d
  * @example
  * const dict = { 'a': 1, 'b': 2, 'c': 3 }
  * const maps = { 'a': 'a1', 'c': 'c1', 'd': 'd1' }
- * const defaults = {'d1': ''}
+ * const valMap = {'d1': ''}
  * const method = 'new' | 'rename' | 'update';
- * updateKeys(dict, maps, defaults, method)
+ * updateKeys(dict, maps, valMap, method)
  * =>
  * - { a1: 1, c1: 3, d1: '' } <= method = 'new'
  * - { a1: 1, b: 2, c1: 3 } <= method = 'rename'
  * - { a1: 1, b: 2, c1: 3, d1: '' } <= method = 'update'
  */
-const updateKeys = (obj: Record<string, any>, maps: Record<string, string>, defaults: Record<string, any>, dfault = "", method = "new") => {
+const updateKeys = (obj: Record<string, any>, maps: Record<string, string>, valMap: Record<string, any>, dfault = "", method = "new") => {
   let _obj = maps; // method: `new`
   switch (method.toLowerCase()) {
     case "rename":
       _obj = obj;
       break;
     case "update":
-      _obj = { ...obj, ...defaults };
+      _obj = { ...obj, ...valMap };
       break;
   }
 
   return Object.keys(_obj).reduce(function (obj_, key) {
-    obj_[maps[key] ?? key] = obj[key] ?? defaults[key] ?? dfault;
+    obj_[maps[key] ?? key] = obj[key] ?? valMap[key] ?? dfault;
     return obj_;
   }, {} as Record<string, any>);
 };
@@ -352,16 +355,16 @@ const arrFromDicts = (dicts: any[], key: string) => {
 };
 
 /**
- * Returns Dict(object) From Pair(Keys, Vals)
+ * Returns Dict(object) From Duo(Keys, Vals)
  * @param keys - dict keys
  * @param vals - dict values
  *
  * @example
- * dictFromPair(['a', 'b'], [1, 2]))
+ * dictFromDuo(['a', 'b'], [1, 2]))
  *  => {'a': 1, 'b': 2}
  * ```
  */
-const dictFromPair = (keys: any[], vals: any[]) => {
+const dictFromDuo = (keys: any[], vals: any[]) => {
   return keys.reduce((dict, key, i) => {
     dict[key] = vals[i];
     return dict;
@@ -369,15 +372,15 @@ const dictFromPair = (keys: any[], vals: any[]) => {
 };
 
 /**
- * Returns Dicts(objects) From Pairs(Keys, Valss)
+ * Returns Dicts(objects) From Duos(Keys, Valss)
  * @param keys - dict keys
  * @param vals - array of values
  *
  * @example
- * dictFromPair(['a', 'b'], [[1, 2], [3,4]])
+ * dictFromDuo(['a', 'b'], [[1, 2], [3,4]])
  *  => [{'a': 1, 'b': 2}, {'a': 3, 'b': 4}]
  */
-const dictsFromPairs = (keys: any[], valss: any[][]) => {
+const dictsFromDuos = (keys: any[], valss: any[][]) => {
   return valss.map((vals) =>
     keys.reduce((dict, key, i) => {
       dict[key] = vals[i];
@@ -387,13 +390,13 @@ const dictsFromPairs = (keys: any[], valss: any[][]) => {
 };
 
 /**
- * Arrs From Dict
+ * Duo From Dict
  * @param obj - source dict
  * @example
- * arrsFromDict({'h1': 'v11', 'h1': 'v12'})
+ * duoFromDict({'h1': 'v11', 'h1': 'v12'})
  *  => [['h1', 'h2'], ['v11', 'v12']]
  */
-const arrsFromDict = (obj: any) => {
+const duoFromDict = (obj: any) => {
   if (obj === null || typeof obj !== "object") {
     return [];
   }
@@ -401,61 +404,61 @@ const arrsFromDict = (obj: any) => {
 };
 
 /**
- * Arrs Added Default Values
- * @param arrs - given arrs
- * @param defaults - added default values
+ * Rows Added Default Values
+ * @param rows - given rows
+ * @param valMap - added default values
  * @param isPush -
  *
  * @example
- *  arrsAddedDefaults([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']], {'h3': ''}, false)
+ *  rowsAddedDefaults([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']], {'h3': ''}, false)
  *  => [['h1', 'h2', 'h3'], ['v11', 'v12', ''], ['v21', 'v22', '']]
  */
-const arrsAddedDefaults = (arrs: any[], defaults = {}, isPush = false) => {
-  const addKeys = Object.keys(defaults);
-  const addVals = Object.values(defaults);
+const rowsAddedDefaults = (rows: any[], valMap = {}, isPush = false) => {
+  const addKeys = Object.keys(valMap);
+  const addVals = Object.values(valMap);
   if (isPush) {
-    return arrs.map((arr, i) => (i === 0 ? [...arr, ...addKeys] : [...arr, ...addVals]));
+    return rows.map((arr, i) => (i === 0 ? [...arr, ...addKeys] : [...arr, ...addVals]));
   } else {
-    return arrs.map((arr, i) => (i === 0 ? [...addKeys, ...arr] : [...addVals, ...arr]));
+    return rows.map((arr, i) => (i === 0 ? [...addKeys, ...arr] : [...addVals, ...arr]));
   }
 };
 
 /**
  * headerIndexArr
  *   - newKeys
- *   - pair의 key에 해당하는 oldHeader의 index(-1: oldHeader에는 없는 key)
- * @param oldHeader - source arrs
- * @param pair - key mapping [['oldKey1', ...], ['newKey1', ...]]
+ *   - keyDuo의 key에 해당하는 oldHeader의 index(-1: oldHeader에는 없는 key)
+ * @param oldHeader - source rows
+ * @param keyDuo - key mapping [['oldKey1', ...], ['newKey1', ...]]
  * @example
  * headerIndexArr(['h1', 'h2', 'h3'],  [['h3', 'h4', 'h1'], ['_h3', '_h4', '_h1']])
  *  => [['_h3', '_h4', '_h1'], [2, -1, 0]]
  */
-const headerIndexArr = (oldHeader: any[], pair: any[][]) => {
+const headerIndexArr = (oldHeader: any[], keyDuo: any[][] = [[]]) => {
   let newHeader = oldHeader;
   let indexArr = [...Array(oldHeader.length).keys()];
-  if (pair) {
-    newHeader = pair[1];
-    indexArr = pair[0].map((h) => oldHeader.indexOf(h));
+  if (keyDuo[0].length > 0) {
+    newHeader = keyDuo[1];
+    indexArr = keyDuo[0].map((h) => oldHeader.indexOf(h));
   }
   return [newHeader, indexArr];
 };
 
 /**
- * Dicts From Arrs
- * @param arrs - source arrs
- * @param pair - key mapping [['oldKey1', ...], ['newKey1', ...]]
- * @param dfault - arrs에 없는 key인 경우 default값
+ * Dicts From Rows
+ * @param rows - source rows
+ * @param keyDuo - key mapping [['oldKey1', ...], ['newKey1', ...]]
+ * @param dfault - rows에 없는 key인 경우 default값
  * @example
- * dictsFromArrs([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']],  [['h2', 'h3', 'h1'], ['_h2', '_h3', '_h1']])
+ * dictsFromRows([['h1', 'h2'], ['v11', 'v12'], ['v21', 'v22']],  [['h2', 'h3', 'h1'], ['_h2', '_h3', '_h1']])
  *  => [{ _h2: 'v12', _h3: '', _h1: 'v11' }, { _h2: 'v22', _h3: '', _h1: 'v21' }]  // 순서는 의미가 없을 수 있음
  */
-const dictsFromArrs = (arrs: any[][], pair: any[][], dfault = "") => {
-  if (!arrs || arrs.length == 0) {
+const dictsFromRows = (rows: any[][], keyDuo: any[][] = [[]], dfault = "") => {
+  if (!rows || rows.length == 0) {
     return [];
   }
-  let [header, indexMaps] = headerIndexArr(arrs.shift()!, pair);
+  let [header, indexMaps] = headerIndexArr(rows.shift()!, keyDuo);
 
-  return arrs.map((arr) => {
+  return rows.map((arr) => {
     let dict: any = {};
     header.forEach((h: any, i: number) => {
       dict[h] = indexMaps[i] != -1 ? arr[indexMaps[i]] ?? dfault : dfault;
@@ -465,32 +468,32 @@ const dictsFromArrs = (arrs: any[][], pair: any[][], dfault = "") => {
 };
 
 /**
- * Arrs From Dicts
+ * Rows From Dicts
  * @param dicts - source dicts
- * @param pair - key mapping [['oldKey1', ...], ['newKey1', ...]]
- * @param dfault - arrs에 없는 key인 경우 default값
+ * @param keyDuo - key mapping [['oldKey1', ...], ['newKey1', ...]]
+ * @param dfault - rows에 없는 key인 경우 default값
  * @example
- * arrsFromDicts([{'h1': 'v11', 'h2': 'v12', 'h3': 'v13'}, {'h1': 'v21', 'h2': 'v22', 'h3': 'v13'}], [['h3', 'h4', 'h1'], ['_h3', '_h4', '_h1']], '_v_')
+ * rowsFromDicts([{'h1': 'v11', 'h2': 'v12', 'h3': 'v13'}, {'h1': 'v21', 'h2': 'v22', 'h3': 'v13'}], [['h3', 'h4', 'h1'], ['_h3', '_h4', '_h1']], '_v_')
  *  => [[ '_h3', '_h4', '_h1' ], [ 'v13', '_v_', 'v11' ], [ 'v13', '_v_', 'v21' ]]
  */
-const arrsFromDicts = (dicts: any[], pair: any[][], dfault = "") => {
+const rowsFromDicts = (dicts: any[], keyDuo: any[][] = [[]], dfault = "") => {
   if (!dicts || dicts.length == 0) {
     return [];
   }
 
   const _header = Object.keys(dicts[0]);
-  let [header, indexMaps] = headerIndexArr(_header, pair);
+  let [header, indexMaps] = headerIndexArr(_header, keyDuo);
 
-  let arrs = [header];
+  let rows = [header];
   for (let row of dicts) {
     let content = [];
     for (let i = 0; i < header.length; i++) {
       const i_ = indexMaps[i];
       i_ == -1 ? content.push(dfault) : content.push(row[_header[i_]]);
     }
-    arrs.push(content);
+    rows.push(content);
   }
-  return arrs;
+  return rows;
 };
 
 /**
@@ -712,22 +715,22 @@ export {
   strFromAny, // String From Any Data
   tsvFromSrt, // Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
   srtFromTsv, // Convert Tab-Separated Values(`tsv`) => SubRipText(`srt`)
-  arrsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)
-  csvFromArrs, // arrs -> csv
+  rowsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`rows`)
+  csvFromRows, // rows -> csv
   convertStr, // convert string format
-  // ? arr, arrs, pair, pairs, dict, dicts
+  // ? arr, rows, duo, duos, dict, dicts
   newKeys, // New Dict Keys(maps의 key들에 대해, 변경된 key 이름으로 dict 생성)
   renameKeys, // Rename Dict Keys(obj의 key들에 대한 이름 변경(변경 되지 않은 것은 유지))
   overwriteKeys, //Overwrite Dict Keys(newKeys(신규 key 추가) + rename(key 이름 변경))
   updateKeys, // Update Dict Keys
-  arrFromArrs, // Returns arr From arrs(array of array)
+  arrFromArrs, // Returns arr From rows(array of array)
   arrFromDicts, // Returns arr From dicts (extract values by key)
-  dictFromPair, // Returns Dict(object) From Pair(Keys, Vals)
-  dictsFromPairs, //Returns Dicts(objects) From Pairs(Keys, Valss)
-  arrsFromDict, // Arrs From Dict
-  arrsFromDicts, // Arrs From Dicts
-  dictsFromArrs, //Dicts From Arrs
-  arrsAddedDefaults, // Arrs Added Default Values
+  dictFromDuo, // Returns Dict(object) From Duo(Keys, Vals)
+  dictsFromDuos, //Returns Dicts(objects) From Duos(Keys, Valss)
+  duoFromDict, // Duo From Dict
+  rowsFromDicts, // Rows From Dicts
+  dictsFromRows, //Dicts From Rows
+  rowsAddedDefaults, // Rows Added Default Values
   swapDict, // Swap Dict Key-Value
   getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict

@@ -49,6 +49,19 @@ const setPath = (path: string) => {
 };
 
 /**
+ * file 이름 유효한 문자로 변경(+ 공백문자 제거)
+ * @param name: 원본 이름
+ * @param rep: 대체 문자
+ * @param level: 변경 레벨
+ *   level 0: [ !"#$%&\'()*+,-./:;<=>?[\]^_`{|}~“”·]
+ *   level 1: [ "#$%&\'*+,/:;=?[\]^`{|}~]
+ *   level 2(유효하지 않은 문자): [\\/:*?"<>|]
+ */
+const fixFileName = (name: string, rep: string = "+", level = 0) => {
+  return name.replace(/[ !"#$%&\'()*+,-./:;<=>?[\]^_`{|}~“”·]/g, rep);
+};
+
+/**
  * Load data(string) from file with charset(encoding)
  */
 const loadFile = (path: string, encoding: BufferEncoding = "utf8") => {

@@ -8,22 +8,22 @@ export {
   strFromAny, // String From Any Data
   tsvFromSrt, // Convert SubRipText(`srt`) format string => Tab-Separated Values(`tsv`) format string
   srtFromTsv, // Convert Tab-Separated Values(`tsv`) => SubRipText(`srt`)
-  arrsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`arrs`)
-  csvFromArrs, // arrs -> csv
+  rowsFromCsv, // Convert Comma-Separated Values(`csv`) => Array of Array(`rows`)
+  csvFromRows, // rows -> csv
   convertStr, // convert string format
-  // ? arr, arrs, pair, pairs, dict, dicts
+  // ? arr, rows, duo, duos, dict, dicts
   newKeys, // New Dict Keys(maps의 key들에 대해, 변경된 key 이름으로 dict 생성)
   renameKeys, // Rename Dict Keys(obj의 key들에 대한 이름 변경(변경 되지 않은 것은 유지))
   overwriteKeys, //Overwrite Dict Keys(newKeys(신규 key 추가) + rename(key 이름 변경))
   updateKeys, // Update Dict Keys
-  arrFromArrs, // Returns arr From arrs(array of array)
+  arrFromArrs, // Returns arr From rows(array of array)
   arrFromDicts, // Returns arr From dicts (extract values by key)
-  dictFromPair, // Returns Dict(object) From Pair(Keys, Vals)
-  dictsFromPairs, //Returns Dicts(objects) From Pairs(Keys, Valss)
-  arrsFromDict, // Arrs From Dict
-  arrsFromDicts, // Arrs From Dicts
-  dictsFromArrs, //Dicts From Arrs
-  arrsAddedDefaults, // Arrs Added Default Values
+  dictFromDuo, // Returns Dict(object) From Duo(Keys, Vals)
+  dictsFromDuos, //Returns Dicts(objects) From Duos(Keys, Valss)
+  duoFromDict, // Duo From Dict
+  rowsFromDicts, // Rows From Dicts
+  dictsFromRows, //Dicts From Rows
+  rowsAddedDefaults, // Rows Added Default Values
   swapDict, // Swap Dict Key-Value
   getUpsertDicts, // Get Upsert Dicts({adds: [], dels: [], upds: []})
   removeDictKeys, // Remove Keys From Dict
