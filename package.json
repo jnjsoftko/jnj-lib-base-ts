@@ -1,0 +1,27 @@
+{
+  "name": "jnj-lib-base",
+  "version": "0.0.30",
+  "main": "./cjs/index.js",
+  "module": "./esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./cjs/index.js"
+    }
+  },
+  "scripts": {
+    "build": "npm run build:cjs & npm run build:esm",
+    "build:cjs": "tsc --p ./cjs/tsconfig.json",
+    "build:esm": "tsc --p ./esm/tsconfig.json",
+    "clean": "del .\\cjs\\*.ts && del .\\cjs\\*.js && del .\\cjs\\*.map && del .\\esm\\*.ts && del .\\esm\\*.js && del .\\esm\\*.map"
+  },
+  "devDependencies": {
+    "@octokit/rest": "^20.0.1",
+    "@types/node": "^20.4.2",
+    "child_process": "^1.0.2",
+    "dotenv": "^16.3.1",
+    "typescript": "^4.6.2"
+  },
+  "description": "JnJ Utility Library For Base Development Support in Typescript",
+  "author": "Jnj Soft Ko <jnjsoft.ko@gmail.com>"
+}
