@@ -32,7 +32,7 @@ import { loadJson } from "./builtin.js";
 // & Variable AREA
 // &---------------------------------------------------------------------------
 dotenv.config(); // 실행 경로에 있는 `.env`
-const settingsPath = process.env.ENV_SETTINGS_PATH ?? "C:/JnJ-soft/Developments/_Settings";
+const settingsPath = process.env.DEV_SETTINGS ?? "C:/JnJ-soft/Developments/_Settings";
 
 // & Function AREA
 // &---------------------------------------------------------------------------
