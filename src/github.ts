@@ -28,6 +28,7 @@ import dotenv from "dotenv";
 
 // ? UserMade Modules
 import { loadJson } from "./builtin.js";
+import { sleep } from "./basic.js";
 
 // & Variable AREA
 // &---------------------------------------------------------------------------
@@ -133,6 +134,8 @@ class Github {
     // create empty repo
     const [auto_init, gitignore_template, license_template] = [false, null, null];
     this.createRepo({ name, description, auto_init, gitignore_template, license_template });
+
+    sleep(5); // 5초 지연
 
     // git init
     let cmd = `git init`;
