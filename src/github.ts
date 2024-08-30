@@ -134,24 +134,24 @@ class Github {
     const [auto_init, gitignore_template, license_template] = [false, null, null];
     this.createRepo({ name, description, auto_init, gitignore_template, license_template });
 
-    // git init
-    let cmd = `git init`;
-    cmd += ` && git config user.name "${fullName}"`;
-    cmd += ` && git config user.email "${email}"`;
-    cmd += ` && git remote add origin https://${this.userName}:${token}@github.com/${this.userName}/${name}.git`;
-    // cmd += ` && git remote set-url origin https://${token}@github.com/${userName}/${repoName}.git`;
-    // console.log(cmd);
-    execSync(cmd);
+    // // git init
+    // let cmd = `git init`;
+    // cmd += ` && git config user.name "${fullName}"`;
+    // cmd += ` && git config user.email "${email}"`;
+    // cmd += ` && git remote add origin https://${this.userName}:${token}@github.com/${this.userName}/${name}.git`;
+    // // cmd += ` && git remote set-url origin https://${token}@github.com/${userName}/${repoName}.git`;
+    // // console.log(cmd);
+    // execSync(cmd);
 
-    // git config, add remote
-    cmd = `git add . && git commit -m "Initial commit"`;
-    // console.log(cmd);
-    execSync(cmd);
+    // // git config, add remote
+    // cmd = `git add . && git commit -m "Initial commit"`;
+    // // console.log(cmd);
+    // execSync(cmd);
 
-    // push
-    cmd = `git push -u origin master`;
-    console.log(cmd);
-    execSync(cmd);
+    // // push
+    // cmd = `git push -u origin master`;
+    // console.log(cmd);
+    // execSync(cmd);
   };
 
   deleteRepo = (options: any) => {
