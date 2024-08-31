@@ -1,6 +1,6 @@
 {
   "name": "jnj-lib-base",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "main": "./cjs/index.js",
   "module": "./esm/index.js",
   "exports": {
