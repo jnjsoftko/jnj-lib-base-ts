@@ -152,7 +152,7 @@ class Github {
     execSync(cmd);
 
     // push
-    cmd = `git push -u origin main`;
+    cmd = `git push -u origin main`; // master -> main
     console.log("#### ", cmd);
     execSync(cmd);
   };
