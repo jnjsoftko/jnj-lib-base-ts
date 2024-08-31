@@ -136,12 +136,12 @@ class Github {
     // this.createRepo({ name, description, auto_init, gitignore_template, license_template });
 
     // sleep(10); // 5초 지연
-    sleep(5); // 5초 지연
+    sleep(3); // 5초 지연
     // git init
     let cmd = `git init`;
     cmd += ` && git config user.name "${fullName}"`;
     cmd += ` && git config user.email "${email}"`;
-    cmd += ` && git remote add origin https://${this.userName}:${token}@github.com/${this.userName}/${name}.git`;
+    cmd += ` && git remote add origin https://${token}@github.com/${this.userName}/${name}.git`;
     // cmd += ` && git remote set-url origin https://${token}@github.com/${userName}/${repoName}.git`;
     console.log("#### ", cmd);
     execSync(cmd);
@@ -152,7 +152,7 @@ class Github {
     execSync(cmd);
 
     // push
-    cmd = `git push -u origin master`;
+    cmd = `git push -u origin main`;
     console.log("#### ", cmd);
     execSync(cmd);
   };
