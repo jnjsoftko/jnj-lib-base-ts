@@ -6,4 +6,5 @@ IF "%~1"=="" (
 ) ELSE (
   SET mode=%1
 )
+
 yarn clean && yarn build && npm version %mode% && npm publish
