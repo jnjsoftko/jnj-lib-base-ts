@@ -137,7 +137,7 @@ class Github {
 
     // sleep(10); // 5초 지연
     sleep(3); // 5초 지연
-    // git init
+    // * git init
     let cmd = `git init`;
     cmd += ` && git config user.name "${fullName}"`;
     cmd += ` && git config user.email "${email}"`;
@@ -146,15 +146,25 @@ class Github {
     console.log("#### ", cmd);
     execSync(cmd);
 
-    // git config, add remote
+    // * git config, add remote
     cmd = `git add . && git commit -m "Initial commit"`;
     console.log("#### ", cmd);
     execSync(cmd);
 
-    // push
-    cmd = `git push -u origin main`; // master -> main
-    console.log("#### ", cmd);
-    execSync(cmd);
+    // * push
+    // cmd = `git push -u origin main`; // master -> main
+    // console.log("#### ", cmd);
+    // execSync(cmd);
+    const branches = execSync("git branch");
+
+    // 조건에 따라 push 명령 실행
+    if (branches.includes("main")) {
+      execSync("git push -u origin main");
+    } else if (branches.includes("master")) {
+      execSync("git push -u origin master");
+    } else {
+      console.log("main 또는 master 브랜치가 없습니다.");
+    }
   };
 
   deleteRepo = (options: any) => {
